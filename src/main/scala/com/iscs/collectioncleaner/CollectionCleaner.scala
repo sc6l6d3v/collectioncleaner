@@ -24,6 +24,13 @@ object CollectionCleaner extends IOApp {
     }
   }.sequence_
 
+  private def processMaps(filterLists: Map[String, List[String]]): List[String] = {
+    filterLists.map{ case (name, collections) =>
+      val times = collections.map(_.split("-",2).last)
+      s"for $name at ${times.mkString(",")}"
+    }.toList
+  }
+
   def run(args: List[String]): IO[ExitCode] =
     MongoClient.fromConnectionString[IO](mongoUri).use { client =>
       for {
@@ -40,7 +47,7 @@ object CollectionCleaner extends IOApp {
             } yield ()
           }
         }.toList.sequence_
-        _           <- IO.println(s"maps returned: $filterLists")
+        _           <- IO.println(s"maps returned: ${processMaps(filterLists).mkString(";")}")
       } yield ()
     }.as(ExitCode.Success)
 }

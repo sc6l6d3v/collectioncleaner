@@ -7,9 +7,11 @@ object Dependencies {
     val catsRetryVersion = "1.1.0"
     val log4catsVersion = "2.3.1"
     val loggingVersion = "3.9.2"
-    val mongo4catsVersion = "0.4.8"
+    val mongo4catsVersion = "0.6.15"
+    val catsVersion = "3.9.0"
+    val catsEffectVersion = "3.5.0"
     val scalatestVersion = "3.2.2"
-    val mongoScalaVersion = "4.2.3"
+    val mongoScalaVersion = "4.10.0"
   }
 
   lazy val scalaTest = "org.scalatest" %% "scalatest" % Versions.scalatestVersion % Test
@@ -22,6 +24,8 @@ object Dependencies {
   object cats {
     val retry = "com.github.cb372" %% "cats-retry"      % Versions.catsRetryVersion
     val log4cats = "org.typelevel" %% s"log4cats-slf4j" % Versions.log4catsVersion
+    val cats = "org.typelevel" %% "cats-core" % Versions.catsVersion
+    val catsEffect = "org.typelevel" %% "cats-effect" % Versions.catsEffectVersion
   }
 
   object mongodb {
