@@ -1,11 +1,15 @@
 import Dependencies._
 
+ThisBuild / scalaVersion     := "2.13.12" // use your specific Scala version
+ThisBuild / javacOptions     ++= Seq("--release", "17") // For Java 17
+ThisBuild / scalacOptions    ++= Seq("--release", "17")
+
+
 lazy val root = (project in file("."))
   .settings(
     organization := "com.iscs",
     name := "collectioncleaner",
     version := "1.0",
-    scalaVersion := "2.13.12",
     libraryDependencies ++= Seq(
       mongo4cats.core,
       mongo4cats.circe,
