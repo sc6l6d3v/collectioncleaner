@@ -6,13 +6,16 @@ import com.iscs.collectioncleaner.domains.RetentionCheck
 import mongo4cats.client.MongoClient
 import com.typesafe.scalalogging.Logger
 import mongo4cats.database.MongoDatabase
-
 import scala.util.Try
 
 object CollectionCleaner extends IOApp {
   private val L = Logger[this.type]
   private val mongoUri = sys.env.getOrElse("MONGOURI", "localhost")
+  private val dbName = sys.env.getOrElse("DBNAME", "ratingslave")
   private val testMode = sys.env.getOrElse("TESTMODE", "false").toBoolean
+  private val SEMI = ";"
+  private val DASH = "-"
+  private val COMMA = ","
 
   private def dropCollNames(dropList: List[String], db: MongoDatabase[IO]): IO[Unit] = {
     dropList.map { drName =>
@@ -26,8 +29,8 @@ object CollectionCleaner extends IOApp {
 
   private def processMaps(filterLists: Map[String, List[String]]): List[String] = {
     filterLists.map{ case (name, collections) =>
-      val times = collections.map(_.split("-",2).last)
-      s"for $name at ${times.mkString(",")}"
+      val times = collections.map(_.split(DASH,2).last)
+      s"for $name at ${times.mkString(COMMA)}"
     }.toList
   }
 
@@ -36,7 +39,7 @@ object CollectionCleaner extends IOApp {
       for {
         retentionSize <- IO(Try(args.last.toInt).toOption.getOrElse(10))
         retSvc        <- IO(RetentionCheck.impl[IO])
-        db            <- client.getDatabase("ratingslave")
+        db            <- client.getDatabase(dbName)
         collLists     <- db.listCollectionNames
         filterLists   <- retSvc.groupCollNames(collLists.toList, retentionSize)
         _             <- {
@@ -47,7 +50,14 @@ object CollectionCleaner extends IOApp {
             } yield ()
           }
         }.toList.sequence_
-        _           <- IO.println(s"maps returned: ${processMaps(filterLists).mkString(";")}")
+        _           <- IO(L.info(s"maps returned: ${processMaps(filterLists).mkString(SEMI)}"))
       } yield ()
-    }.as(ExitCode.Success)
+    }
+      .as(ExitCode.Success)
+      .handleErrorWith(ex =>
+        IO {
+          L.error(s"An error occurred during collection cleanup {}", ex)
+          ExitCode.Error
+        }
+      )
 }

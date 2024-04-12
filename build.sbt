@@ -5,18 +5,15 @@ lazy val root = (project in file("."))
     organization := "com.iscs",
     name := "collectioncleaner",
     version := "1.0",
-    scalaVersion := "2.13.8",
+    scalaVersion := "2.13.12",
     libraryDependencies ++= Seq(
       mongo4cats.core,
       mongo4cats.circe,
       mongodb.driver,
       scalaTest,
       logback.classic,
-      logback.logging,
-      cats.retry
+      logback.logging
     ),
-    addCompilerPlugin("org.typelevel" %% "kind-projector"     % "0.10.3"),
-    addCompilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1"),
     reStartArgs := Seq("7"),
     Revolver.enableDebugging(5061, true),
     dependencyOverrides ++= Seq(
@@ -34,6 +31,9 @@ scalacOptions ++= Seq(
 )
 
 assembly / assemblyMergeStrategy := {
+  case PathList("META-INF", "services", xs @ _*) => MergeStrategy.concat
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case "io.netty.versions.properties" => MergeStrategy.discard
+  case "reference.conf" => MergeStrategy.concat
   case x => MergeStrategy.first
 }
