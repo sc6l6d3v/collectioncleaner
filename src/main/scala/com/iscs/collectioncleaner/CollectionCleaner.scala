@@ -13,7 +13,7 @@ object CollectionCleaner extends IOApp {
   private val mongoUri = sys.env.getOrElse("MONGOURI", "localhost")
   private val dbName = sys.env.getOrElse("DBNAME", "ratingslave")
   private val testMode = sys.env.getOrElse("TESTMODE", "false").toBoolean
-  private val collGroups = sys.env.getOrElse("GROUPS", "title_principals_namerating").split(",").toList
+  private val collGroups = sys.env.getOrElse("COLLGROUPS", "title_principals_namerating").split(",").toList
   private val SEMI = ";"
   private val DASH = "-"
   private val COMMA = ","
