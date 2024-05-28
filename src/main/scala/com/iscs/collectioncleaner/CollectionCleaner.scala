@@ -13,6 +13,7 @@ object CollectionCleaner extends IOApp {
   private val mongoUri = sys.env.getOrElse("MONGOURI", "localhost")
   private val dbName = sys.env.getOrElse("DBNAME", "ratingslave")
   private val testMode = sys.env.getOrElse("TESTMODE", "false").toBoolean
+  private val collGroups = sys.env.getOrElse("GROUPS", "title_principals_namerating").split(",").toList
   private val SEMI = ";"
   private val DASH = "-"
   private val COMMA = ","
@@ -41,7 +42,7 @@ object CollectionCleaner extends IOApp {
         retSvc        <- IO(RetentionCheck.impl[IO])
         db            <- client.getDatabase(dbName)
         collLists     <- db.listCollectionNames
-        filterLists   <- retSvc.groupCollNames(collLists.toList, retentionSize)
+        filterLists   <- retSvc.groupCollNames(collLists.toList, collGroups, retentionSize)
         _             <- {
           filterLists.map { case (grpName, dropList) =>
             for {
